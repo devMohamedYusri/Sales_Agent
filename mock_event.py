@@ -24,11 +24,11 @@ payload = {
             "contacts": [{"profile": {"name": "Test User"}, "wa_id": "1234567890"}],
             "messages": [
               {
-                "from": "201000000000",  # SAME USER ID (Critical for Memory)
+                "from": "201000000000",  
                 "id": "wamid.HBgLMTIzNDU2Nzg5MA==",
                 "timestamp": "1673000000",
                 "text": {
-                  "body": "Gaming"  # <--- UPDATED MESSAGE
+                  "body": "around 2000$"  
                 },
                 "type": "text"
               }
@@ -43,9 +43,10 @@ payload = {
 
 # Send the request
 try:
-    print(f"📤 Sending User Reply: 'Gaming'...")
+    print(f"📤 Sending User Reply: 'around 2000$'...")
     response = requests.post(url, json=payload)
     print(f"Status Code: {response.status_code}")
     print(f"Response: {response.json()}")
 except Exception as e:
     print(f"Connection Failed: {e}")
+    

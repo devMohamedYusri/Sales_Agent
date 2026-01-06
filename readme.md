@@ -1,6 +1,8 @@
-# AI Sales Agent for WhatsApp & Messenger
+﻿# 🤖 AI Sales Agent (WhatsApp)
 
-An intelligent automated sales assistant designed to handle customer inquiries, qualify leads, and close sales via WhatsApp and Facebook Messenger. This agent leverages Large Language Models (LLMs) using LangChain to provide natural, context-aware responses.
+A production-ready AI Sales Assistant built with **FastAPI**, **LangChain**, and **Llama 3 (via Groq)**. This agent is designed to qualify leads, manage conversation state, and handle real-time WhatsApp webhooks.
+
+![Status](https://img.shields.io/badge/Status-Development-green) ![Python](https://img.shields.io/badge/Python-3.10-blue) ![AI](https://img.shields.io/badge/Model-Llama3--70B-orange)
 
 ## 🚀 Features
 

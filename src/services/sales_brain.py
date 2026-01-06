@@ -1,13 +1,14 @@
 from dotenv import load_dotenv
+import asyncio
 from langchain_groq import ChatGroq
 from langchain_core.prompts import ChatPromptTemplate,MessagesPlaceholder
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.chat_history import BaseChatMessageHistory
 from langchain_core.runnables.history import RunnableWithMessageHistory
-from langchain_community.chat_message_histories import ChatMessageHistory
+from langchain_community.chat_message_histories import SQLChatMessageHistory
 
+from sqlalchemy import create_engine
 load_dotenv()
-store={}
 
 SALES_CONFIG = {
     "brand_name": "TechHaven",
@@ -21,6 +22,9 @@ SALES_CONFIG = {
     ]
 }
 
+DB_CONNECTION = "sqlite:///memory.db"
+engine=create_engine(DB_CONNECTION,connect_args={"check_same_thread": False})
+
 llm=ChatGroq(
     model="llama-3.3-70b-versatile",
     temperature=0.5,
@@ -32,7 +36,7 @@ llm=ChatGroq(
 
 def get_session_history(session_id:str)->BaseChatMessageHistory:
     """
-    Retrieve or create a chat message history for a given sender ID.
+    Retrieve history from SQL database.
 
     :param sender_id: The WhatsApp ID of the sender
     :type sender_id: str
@@ -40,9 +44,11 @@ def get_session_history(session_id:str)->BaseChatMessageHistory:
     :return: The chat message history associated with the sender ID
     :rtype: BaseChatMessageHistory
     """
-    if session_id not in store:
-        store[session_id] = ChatMessageHistory()
-    return store[session_id]
+    return SQLChatMessageHistory(
+        session_id=session_id,
+        connection=engine,
+        table_name="sales_agent_chat_history",
+    )
 
 async def generate_response(message:str,sender_id:str)->str:
     """
@@ -99,11 +105,13 @@ async def generate_response(message:str,sender_id:str)->str:
         )
 
         print(f"🧠 SENDING TO GROQ ({SALES_CONFIG['brand_name']}): {message}")
-        response=await with_history.ainvoke({"message":message},config={
-            "configurable": {
-                "session_id": sender_id
-            }
-        })
+        config = {"configurable": {"session_id": sender_id}}
+
+        response=await asyncio.to_thread(
+            with_history.invoke,
+            {"message":message},
+            config=config
+        )
 
         return response
     except Exception as e:
